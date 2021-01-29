@@ -1,14 +1,51 @@
 /* global chrome */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import SearchField from "react-search-field";
+import './App.scss'
+
+
+function Tab(props) {
+    function openUrl() {
+        chrome.tabs.create({url: props.tab.url, active: true});
+    }
+
+    function openTab() {
+        chrome.tabs.update(props.tab.id, {active: true});
+    }
+
+    function closeTab() {
+        chrome.tabs.remove(props.tab.id);
+        props.refreshTabs();
+    }
+
+    return (
+        <tr>
+            <td>
+                <img src={props.tab.favIconUrl}/>
+            </td>
+            <td>
+                <a href={props.tab.url} onClick={openUrl}>
+                    {props.tab.title}
+                </a>
+            </td>
+            <td>
+                <button onClick={openTab}>
+                    Open
+                </button>
+                <button onClick={closeTab}>
+                    Close
+                </button>
+            </td>
+        </tr>
+    )
+}
 
 
 export default function App() {
     const [title, setTitle] = useState('');
     const [tabs, setTabs] = useState([]);
-
-    useEffect(
+    const refreshTabs = useCallback(
         () => {
             chrome.tabs.query(
                 {},
@@ -26,37 +63,23 @@ export default function App() {
         [title]
     )
 
+    useEffect(
+        () => refreshTabs(),
+        [refreshTabs]
+    )
+
     return (
-        <div>
+        <div className="app">
             <SearchField
                 placeholder="Input title or url"
                 searchText={title}
                 onChange={(value) => setTitle(value)}
             />
-            <table>
-                <thead>
-                    <tr>
-                        <th>
-                            Index
-                        </th>
-                        <th>
-                            Title
-                        </th>
-                    </tr>
-                </thead>
+            <table className="tabs">
                 <tbody>
                     {
                         tabs.map((tab, index) => {
-                            return (
-                                <tr key={index}>
-                                    <th>
-                                        {tab.index}
-                                    </th>
-                                    <th>
-                                        {tab.title}
-                                    </th>
-                                </tr>
-                            )
+                            return <Tab tab={tab} refreshTabs={refreshTabs} key={index}></Tab>
                         })
                     }
                 </tbody>
