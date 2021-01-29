@@ -14,6 +14,7 @@
     "npm-watch": "^0.7.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-search-field": "^1.2.0",
     "style-loader": "^2.0.0",
     "webpack": "^5.18.0",
     "webpack-cli": "^4.4.0",
@@ -27,7 +28,9 @@
   "watch": {
     "build": {
       "patterns": [
-        "src", "webpack.js", "public"
+        "src",
+        "webpack.js",
+        "public"
       ],
       "extensions": "*",
       "quiet": false
