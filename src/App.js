@@ -5,7 +5,36 @@ import SearchField from "react-search-field";
 import './App.scss'
 
 
-function Tab(props) {
+const filterTabs = (tabs, title) => {
+    tabs = tabs.filter(tab => tab.url);
+
+    if(!title) {
+        return tabs
+    }
+
+    tabs = tabs.map(tab => {
+        tab.matchesTitle = tab.title && tab.title.includes(title);
+        tab.matchesUrl = tab.url && tab.url.includes(title);
+        return tab
+    });
+
+    tabs = tabs.filter(tab => tab.matchesTitle || tab.matchesUrl);
+
+    tabs.sort((first, second) => {
+        if(first.matchesTitle && second.matchesTitle) {
+            return 0
+        }
+        if(first.matchesTitle) {
+            return -1
+        }
+        return 1
+    })
+
+    return tabs
+}
+
+
+const Tab = (props) => {
     function openUrl() {
         chrome.tabs.create({url: props.tab.url, active: true});
     }
@@ -24,7 +53,7 @@ function Tab(props) {
             <td>
                 <img src={props.tab.favIconUrl}/>
             </td>
-            <td>
+            <td className="linkColumn">
                 <a href={props.tab.url} onClick={openUrl}>
                     {props.tab.title}
                 </a>
@@ -42,22 +71,14 @@ function Tab(props) {
 }
 
 
-export default function App() {
+export default () => {
     const [title, setTitle] = useState('');
     const [tabs, setTabs] = useState([]);
     const refreshTabs = useCallback(
         () => {
             chrome.tabs.query(
                 {},
-                tabs => {
-                    tabs = tabs.filter(tab => {
-                        if(!title) {
-                            return true
-                        }
-                        return tab.title && tab.title.includes(title)
-                    });
-                    setTabs(tabs)
-                }
+                tabs => setTabs(filterTabs(tabs, title))
             )
         },
         [title]
@@ -79,7 +100,7 @@ export default function App() {
                 <tbody>
                     {
                         tabs.map((tab, index) => {
-                            return <Tab tab={tab} refreshTabs={refreshTabs} key={index}></Tab>
+                            return <Tab tab={tab} refreshTabs={refreshTabs} key={index}/>
                         })
                     }
                 </tbody>
