@@ -1,11 +1,3 @@
-const isArrayEquals = (first, second) => {
-    if (first.length !== second.length) {
-        return false
-    }
-    return first.every((value, index) => value === second[index])
-}
-
-
 const tabComparator = (firstTab, secondTab) => {
 	const firstTabUrl = firstTab.url || '';
 	const secondTabUrl = secondTab.url || '';
@@ -32,6 +24,22 @@ const getTabs = async () => {
 }
 
 
+const [isHostBlocked, setBlocklist] = (() => {
+	let blocklist = [];
+
+	const isHostBlocked = (host) => {
+		return blocklist.includes(host)
+	}
+
+	const setBlocklist = async (newBlocklist) => {
+		blocklist = newBlocklist;
+		await deleteNotInvitedSites();
+	}
+
+	return [isHostBlocked, setBlocklist]
+})();
+
+
 const deleteNotInvitedSites = async () => {
     console.log('deleteNotInvitedSites started');
 	const tabs = await getTabs();
@@ -39,7 +47,7 @@ const deleteNotInvitedSites = async () => {
 		if(!tab.url) {
 			continue
 		}
-		if(!['habr.com', 'pikabu.ru', 'dtf.ru', 'dou.ua'].includes(new URL(tab.url).host)) {
+		if(!isHostBlocked(new URL(tab.url).host)) {
 			continue
 		}
 		await new Promise(resolve => {
@@ -47,7 +55,7 @@ const deleteNotInvitedSites = async () => {
 		})
 	}
 
-    console.log('deleteRussianTabs done');
+    console.log('deleteNotInvitedSites done');
 }
 
 const deleteDuplicatedTabs = async () => {
@@ -87,7 +95,7 @@ const groupTabs = async () => {
    	    await new Promise((resolve) => {
         	chrome.tabs.move(tab.id, {index}, () => resolve())
     	});
-    }   
+    }
     console.log('groupTabs done');
 };
 
@@ -99,12 +107,11 @@ const organizeTabs = async () => {
 }
 
 
-
 const onChangeTab = (() => {
 	let queue = Promise.resolve();
 
 	chrome.alarms.onAlarm.addListener((alarm) => {
-		if(alarm.name != 'onAction') {
+		if(alarm.name !== 'onAction') {
 			return
 		}
 		queue = queue.then(() => organizeTabs())
@@ -128,8 +135,10 @@ const onChangeTab = (() => {
 
 	addOnActionToQueue();
 	return addOnActionToQueue;
-})()
+})();
 
 
-chrome.tabs.onCreated.addListener(onChangeTab);
-chrome.tabs.onUpdated.addListener(onChangeTab);
+export {
+	onChangeTab,
+	setBlocklist
+};

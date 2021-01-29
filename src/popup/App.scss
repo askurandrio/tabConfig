@@ -1,4 +1,12 @@
+.app {
+  width: 250px;
+}
+
 .tabs {
+  table {
+    width: 250px;
+  }
+
   tr, td {
     border-bottom: 1px solid #b9acac;
   }
@@ -13,10 +21,9 @@
   }
 }
 
-.app {
-  .table {
-    width: 250px;
-  }
 
-  width: 250px;
+.blacklist {
+  .loader {
+    max-width: 15px;
+  }
 }

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import SearchField from "react-search-field";
-import './App.scss';
 import Tab from "./Tab";
 
 
@@ -32,10 +31,10 @@ const filterTabs = (tabs, title) => {
     })
 
     return tabs
-}
+};
 
 
-export default () => {
+export default function Tabs() {
     const [title, setTitle] = useState('');
     const [tabs, setTabs] = useState([]);
     const refreshTabs = useCallback(
@@ -54,7 +53,7 @@ export default () => {
     )
 
     return (
-        <div className="app">
+        <div>
             <SearchField
                 placeholder="Input title or url"
                 searchText={title}

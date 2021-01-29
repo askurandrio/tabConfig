@@ -1,13 +1,14 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const baseManifest = require("./public/manifest.json");
+const baseManifest = require("./src/resources/manifest.json");
 const WebpackExtensionManifestPlugin = require("webpack-extension-manifest-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const config = {
   mode: "development",
-  devtool: "eval-cheap-source-map",
+  devtool: "cheap-module-source-map",
   entry: {
-    app: path.join(__dirname, "./src/index.js"),
+    popup: path.join(__dirname, "./src/popup/index.js"),
+    background: path.join(__dirname, "./src/background/index.js"),
   },
   output: {
     path: path.resolve(__dirname, "./build"),
@@ -18,7 +19,7 @@ const config = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, "src", "index.html")
+      template: path.resolve(__dirname, "src", "popup", "index.html")
     }),
     new WebpackExtensionManifestPlugin({
       config: {
@@ -27,9 +28,8 @@ const config = {
     }),
     new CopyPlugin({
       patterns: [
-        { from: "public/icon.ico", to: "icon.ico" },
-        { from: "public/spinner.svg", to: "spinner.svg" },
-        { from: "public/background.js", to: "background.js" }
+        { from: "src/resources/icon.ico", to: "icon.ico" },
+        { from: "src/resources/spinner.svg", to: "spinner.svg" },
       ]
     })
   ],

@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-
-
-const makeLoader = () => {
-    return <img src={chrome.runtime.getURL('spinner.svg')}/>
-}
+import {makeLoader} from "./utils";
 
 
 function TabUrl(props) {
@@ -25,7 +21,7 @@ function TabUrl(props) {
     }
 
     return (
-        <a href={props.tab.url} onChange={openUrl}>
+        <a href={props.tab.url} onClick={openUrl}>
             {props.tab.url}
         </a>
     )

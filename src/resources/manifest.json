@@ -2,7 +2,8 @@
   "short_name": "TabConfig",
   "permissions": [
     "tabs",
-    "alarms"
+    "alarms",
+    "storage"
   ],
   "name": "TabConfig",
   "version": "0.1",
