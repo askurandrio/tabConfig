@@ -28,6 +28,7 @@ const config = {
     new CopyPlugin({
       patterns: [
         { from: "public/icon.ico", to: "icon.ico" },
+        { from: "public/spinner.svg", to: "spinner.svg" },
         { from: "public/background.js", to: "background.js" }
       ]
     })

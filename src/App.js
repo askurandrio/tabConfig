@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import SearchField from "react-search-field";
-import './App.scss'
+import './App.scss';
+import Tab from "./Tab";
 
 
 const filterTabs = (tabs, title) => {
@@ -31,43 +32,6 @@ const filterTabs = (tabs, title) => {
     })
 
     return tabs
-}
-
-
-const Tab = (props) => {
-    function openUrl() {
-        chrome.tabs.create({url: props.tab.url, active: true});
-    }
-
-    function openTab() {
-        chrome.tabs.update(props.tab.id, {active: true});
-    }
-
-    function closeTab() {
-        chrome.tabs.remove(props.tab.id);
-        props.refreshTabs();
-    }
-
-    return (
-        <tr>
-            <td>
-                <img src={props.tab.favIconUrl}/>
-            </td>
-            <td className="linkColumn">
-                <a href={props.tab.url} onClick={openUrl}>
-                    {props.tab.title}
-                </a>
-            </td>
-            <td>
-                <button onClick={openTab}>
-                    Open
-                </button>
-                <button onClick={closeTab}>
-                    Close
-                </button>
-            </td>
-        </tr>
-    )
 }
 
 
