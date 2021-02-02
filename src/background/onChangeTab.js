@@ -4,7 +4,7 @@ const tabComparator = (firstTab, secondTab) => {
 	if((!firstTabUrl) || (!secondTabUrl)) {
 		return firstTabUrl.localeCompare(secondTabUrl)
 	}
-	if (new URL(firstTabUrl).host != new URL(secondTabUrl).host) {
+	if (new URL(firstTabUrl).host !== new URL(secondTabUrl).host) {
 		return firstTabUrl.localeCompare(secondTabUrl)
 	}
 	const firstTabTitle = firstTab.title || '';
@@ -64,9 +64,9 @@ const deleteDuplicatedTabs = async () => {
 
 	while(tabs.length) {
 		const currentTab = tabs[0];
-		const duplicatedTabs = tabs.filter((tab) => tab.url == currentTab.url);
-		tabs = tabs.filter((tab) => tab.url != currentTab.url);
-		if(duplicatedTabs.length == 1) {
+		const duplicatedTabs = tabs.filter((tab) => tab.url === currentTab.url);
+		tabs = tabs.filter((tab) => tab.url !== currentTab.url);
+		if(duplicatedTabs.length === 1) {
 			continue
 		}
 		duplicatedTabs.sort((first, second) => {

@@ -3,16 +3,17 @@ import {makeLoader} from "./utils";
 
 
 function TabUrl(props) {
-    const [isOpening, setIsOpening] = useState(false);
-    function openUrl() {
-        setIsOpening(true);
-        chrome.tabs.create(
-            {url: props.tab.url, active: true},
-            () => setIsOpening(false)
+    const [isMarking, setIsMarking] = useState(false);
+    function markTabAsActive() {
+        setIsMarking(true);
+        chrome.tabs.update(
+            props.tab.id,
+            {active: true},
+            () => setIsMarking(false)
         )
     }
 
-    if(isOpening) {
+    if(isMarking) {
         return (
             <a href={props.tab.url}>
                 {makeLoader()}
@@ -21,21 +22,20 @@ function TabUrl(props) {
     }
 
     return (
-        <a href={props.tab.url} onClick={openUrl}>
-            {props.tab.url}
+        <a href={props.tab.url} onClick={markTabAsActive}>
+            {props.tab.title}
         </a>
     )
 }
 
 
-function TabOpen(props) {
+function OpenInNewTab(props) {
     const [isOpening, setIsOpening] = useState(false);
-    function openTab() {
+    function openInNewTab() {
         setIsOpening(true);
-        chrome.tabs.update(
-            props.tab.id,
-            {active: true},
-            () => setIsOpening(false)
+        chrome.tabs.create(
+            {url: props.tab.url, active: true},
+            () => setIsMarking(false)
         )
     }
 
@@ -48,7 +48,7 @@ function TabOpen(props) {
     }
 
     return (
-        <button onClick={openTab}>
+        <button onClick={openInNewTab}>
             Open
         </button>
     )
@@ -90,7 +90,7 @@ export default function Tab(props) {
                 <TabUrl tab={props.tab}/>
             </td>
             <td>
-                <TabOpen tab={props.tab}/>
+                <OpenInNewTab tab={props.tab}/>
                 <TabClose tab={props.tab} refreshTabs={props.refreshTabs}/>
             </td>
         </tr>

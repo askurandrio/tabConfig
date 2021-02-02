@@ -13,7 +13,8 @@ const filterTabs = (tabs, title) => {
     }
 
     tabs = tabs.map(tab => {
-        tab.matchesTitle = tab.title && tab.title.includes(title);
+        tab.matchesTitle = tab.title && tab.title.toLowerCase().includes(title.toLowerCase());
+        tab.matchesRawTitle = tab.title && tab.title.includes(title);
         tab.matchesUrl = tab.url && tab.url.includes(title);
         return tab
     });
@@ -22,7 +23,13 @@ const filterTabs = (tabs, title) => {
 
     tabs.sort((first, second) => {
         if(first.matchesTitle && second.matchesTitle) {
-            return 0
+            if(first.matchesRawTitle && second.matchesRawTitle) {
+                return 0
+            }
+            if(first.matchesRawTitle) {
+                return -1
+            }
+            return 1
         }
         if(first.matchesTitle) {
             return -1
