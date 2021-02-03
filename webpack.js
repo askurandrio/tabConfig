@@ -30,7 +30,7 @@ module.exports = {
     }),
     new CopyPlugin({
       patterns: [
-        { from: "src/resources/icon.ico", to: "icon.ico" },
+        { from: "src/resources/icon.png", to: "icon.png" },
         { from: "src/resources/spinner.svg", to: "spinner.svg" },
       ]
     }),
