@@ -3,7 +3,9 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const baseManifest = require("./src/resources/manifest.json");
 const WebpackExtensionManifestPlugin = require("webpack-extension-manifest-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
-const config = {
+var ZipPlugin = require('zip-webpack-plugin');
+
+module.exports = {
   mode: "development",
   devtool: "cheap-module-source-map",
   entry: {
@@ -31,6 +33,10 @@ const config = {
         { from: "src/resources/icon.ico", to: "icon.ico" },
         { from: "src/resources/spinner.svg", to: "spinner.svg" },
       ]
+    }),
+    new ZipPlugin({
+    	filename: 'build.zip',
+    	path: '../'
     })
   ],
   module: {
@@ -51,4 +57,3 @@ const config = {
     ]
   }
 };
-module.exports = config;
