@@ -1,8 +1,9 @@
 /* global chrome */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import SearchField from "react-search-field";
 import Tab from "./Tab";
+import TabsSearch from "./TabsSearch";
+import {useLoader} from "./utils";
 
 
 const filterTabs = (tabs, title) => {
@@ -41,32 +42,61 @@ const filterTabs = (tabs, title) => {
 };
 
 
-export default function Tabs() {
-    const [title, setTitle] = useState('');
-    const [tabs, setTabs] = useState([]);
-    const refreshTabs = useCallback(
-        () => {
-            chrome.tabs.query(
-                {},
-                tabs => setTabs(filterTabs(tabs, title))
-            )
-        },
-        [title]
-    )
+const useInternalTabs = () => {
+    const [internalTabs, setInternalTabs] = useState([]);
+    const refreshInternalTabs = async () => {
+        const tabs = await new Promise(resolve => {
+            chrome.tabs.query({}, (tabs) => resolve(tabs))
+        });
+        setInternalTabs(tabs);
+    }
 
-    useEffect(
-        () => refreshTabs(),
-        [refreshTabs]
-    )
+    useEffect(() => {
+        let queue = refreshInternalTabs();
+        const intervalId = setInterval(
+            () => queue = queue.then(() => refreshInternalTabs()),
+            2000
+        );
+        return () => {
+            clearInterval(intervalId);
+        }
+    }, []);
+
+    return {internalTabs, refreshInternalTabs}
+}
+
+
+const useTabs = () => {
+    const [tabs, setTabs] = useState([]);
+    const [query, setQuery] = useState('');
+    const {internalTabs, refreshInternalTabs} = useInternalTabs();
+
+    useEffect(() => {
+        const filteredTabs = filterTabs(internalTabs, query);
+        setTabs(filteredTabs)
+    }, [query, internalTabs]);
+    const loader = useLoader(() => refreshInternalTabs())
+
+    useEffect(() => {
+        loader.wrappedLoader()
+    }, []);
+
+    return {tabs, query, setQuery, isSearching: loader.isLoading, refreshTabs: loader.wrappedLoader}
+}
+
+
+export default function Tabs() {
+    const {tabs, query, setQuery, isSearching, refreshTabs} = useTabs();
 
     return (
-        <div>
-            <SearchField
-                placeholder="Input title or url"
-                searchText={title}
-                onChange={(value) => setTitle(value)}
+        <div className="tabs">
+            <TabsSearch
+                query={query}
+                setQuery={setQuery}
+                isSearching={isSearching}
+                refreshTabs={refreshTabs}
             />
-            <table className="tabs">
+            <table>
                 <tbody>
                     {
                         tabs.map((tab, index) => {

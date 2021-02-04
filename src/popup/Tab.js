@@ -1,19 +1,11 @@
-import React, { useState } from 'react';
-import {makeLoader} from "./utils";
+/* global chrome */
+import React from 'react';
+import {useLoader, makeLoader} from "./utils";
+import {useIsMounted} from "react-tidy";
 
 
 function TabUrl(props) {
-    const [isMarking, setIsMarking] = useState(false);
-    function markTabAsActive() {
-        setIsMarking(true);
-        chrome.tabs.update(
-            props.tab.id,
-            {active: true},
-            () => setIsMarking(false)
-        )
-    }
-
-    if(isMarking) {
+    if(props.markTabAsActive.isLoading) {
         return (
             <a href={props.tab.url}>
                 {makeLoader()}
@@ -22,24 +14,15 @@ function TabUrl(props) {
     }
 
     return (
-        <a href={props.tab.url} onClick={markTabAsActive}>
+        <a href={props.tab.url} onClick={props.markTabAsActive.wrappedLoader}>
             {props.tab.title}
         </a>
     )
 }
 
 
-function OpenInNewTab(props) {
-    const [isOpening, setIsOpening] = useState(false);
-    function openInNewTab() {
-        setIsOpening(true);
-        chrome.tabs.create(
-            {url: props.tab.url, active: true},
-            () => setIsMarking(false)
-        )
-    }
-
-    if(isOpening) {
+function TabOpen(props) {
+    if(props.markTabAsActive.isLoading) {
         return (
             <button disabled>
                 {makeLoader()}
@@ -48,7 +31,7 @@ function OpenInNewTab(props) {
     }
 
     return (
-        <button onClick={openInNewTab}>
+        <button onClick={props.markTabAsActive.wrappedLoader}>
             Open
         </button>
     )
@@ -56,15 +39,16 @@ function OpenInNewTab(props) {
 
 
 function TabClose(props) {
-    const [isClosing, setIsClosing] = useState(false);
-    async function closeTab() {
-        setIsClosing(true);
-        await new Promise(resolve => chrome.tabs.remove(props.tab.id, resolve));
-        await props.refreshTabs();
-        setIsClosing(false)
-    }
+    const isMounted = useIsMounted()
+    const {isLoading, wrappedLoader} = useLoader(
+        async () => {
+            await new Promise(resolve => chrome.tabs.remove(props.tab.id, resolve));
+            await props.refreshTabs();
+        },
+        isMounted
+    )
 
-    if(isClosing) {
+    if(isLoading) {
         return (
             <button disabled>
                 {makeLoader()}
@@ -73,7 +57,7 @@ function TabClose(props) {
     }
 
     return (
-        <button onClick={closeTab}>
+        <button onClick={wrappedLoader}>
             Close
         </button>
     )
@@ -81,16 +65,22 @@ function TabClose(props) {
 
 
 export default function Tab(props) {
+    const markTabAsActive = useLoader(() => {
+        return new Promise(resolve => {
+            chrome.tabs.update(props.tab.id, {active: true}, resolve)
+        })
+    })
+
     return (
         <tr>
             <td>
                 <img src={props.tab.favIconUrl}/>
             </td>
             <td className="linkColumn">
-                <TabUrl tab={props.tab}/>
+                <TabUrl tab={props.tab} markTabAsActive={markTabAsActive}/>
             </td>
             <td>
-                <OpenInNewTab tab={props.tab}/>
+                <TabOpen markTabAsActive={markTabAsActive}/>
                 <TabClose tab={props.tab} refreshTabs={props.refreshTabs}/>
             </td>
         </tr>
