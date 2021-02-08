@@ -1,4 +1,5 @@
 /* global chrome */
+import 'chrome-extension-async';
 import {onChangeTab, setBlocklist} from './onChangeTab';
 import {getBlocklist} from '../generic/utils';
 

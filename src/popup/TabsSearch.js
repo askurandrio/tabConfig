@@ -1,5 +1,3 @@
-/* global chrome */
-
 import React from 'react';
 import {makeLoader} from "./utils";
 
@@ -25,42 +23,6 @@ const SearchIcon = () => {
       </g>
     </svg>
   );
-};
-
-
-const filterTabs = (tabs, title) => {
-    tabs = tabs.filter(tab => tab.url);
-
-    if(!title) {
-        return tabs
-    }
-
-    tabs = tabs.map(tab => {
-        tab.matchesTitle = tab.title && tab.title.toLowerCase().includes(title.toLowerCase());
-        tab.matchesRawTitle = tab.title && tab.title.includes(title);
-        tab.matchesUrl = tab.url && tab.url.includes(title);
-        return tab
-    });
-
-    tabs = tabs.filter(tab => tab.matchesTitle || tab.matchesUrl);
-
-    tabs.sort((first, second) => {
-        if(first.matchesTitle && second.matchesTitle) {
-            if(first.matchesRawTitle && second.matchesRawTitle) {
-                return 0
-            }
-            if(first.matchesRawTitle) {
-                return -1
-            }
-            return 1
-        }
-        if(first.matchesTitle) {
-            return -1
-        }
-        return 1
-    })
-
-    return tabs
 };
 
 

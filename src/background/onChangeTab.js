@@ -1,3 +1,5 @@
+/* global chrome */
+
 const tabComparator = (firstTab, secondTab) => {
 	const firstTabUrl = firstTab.url || '';
 	const secondTabUrl = secondTab.url || '';
@@ -10,17 +12,6 @@ const tabComparator = (firstTab, secondTab) => {
 	const firstTabTitle = firstTab.title || '';
 	const secondTabTitle = secondTab.title || '';
 	return firstTabTitle.localeCompare(secondTabTitle)
-}
-
-
-const getTabs = async () => {
-    console.log('getTabs started');
-    const tabs = await new Promise((resolve) => {
-        chrome.tabs.query({}, (tabs) => resolve(tabs))
-    });
-    tabs.sort(tabComparator);
-    console.log('getTabs done');
-    return tabs
 }
 
 
@@ -42,7 +33,8 @@ const [isHostBlocked, setBlocklist] = (() => {
 
 const deleteNotInvitedSites = async () => {
     console.log('deleteNotInvitedSites started');
-	const tabs = await getTabs();
+	const tabs = await chrome.tabs.query({});
+	tabs.sort(tabComparator);
 	for(const tab of tabs) {
 		if(!tab.url) {
 			continue
@@ -60,7 +52,8 @@ const deleteNotInvitedSites = async () => {
 
 const deleteDuplicatedTabs = async () => {
     console.log('deleteDuplicatedTabs started');
-	let tabs = await getTabs();
+	let tabs = await chrome.tabs.query();
+	tabs.sort(tabComparator);
 
 	while(tabs.length) {
 		const currentTab = tabs[0];
@@ -87,15 +80,18 @@ const deleteDuplicatedTabs = async () => {
 
 const groupTabs = async () => {
     console.log('groupTabs started');
-	const tabs = await getTabs();
-    for(const [index, tab] of tabs.entries()) {
-    	if (tab.index == index) {
-    		continue;
-    	}
-   	    await new Promise((resolve) => {
-        	chrome.tabs.move(tab.id, {index}, () => resolve())
-    	});
-    }
+	for(const window of await chrome.windows.getAll({})) {
+		const tabs = await chrome.tabs.query({windowId: window.id});
+		tabs.sort(tabComparator);
+		for(const [index, tab] of tabs.entries()) {
+			if (tab.index == index) {
+				continue;
+			}
+			await new Promise((resolve) => {
+				chrome.tabs.move(tab.id, {index}, () => resolve())
+			});
+		}
+	}
     console.log('groupTabs done');
 };
 

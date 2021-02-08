@@ -1,6 +1,6 @@
 /* global chrome */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Tab from "./Tab";
 import TabsSearch from "./TabsSearch";
 import {useLoader} from "./utils";
@@ -66,7 +66,7 @@ const useInternalTabs = () => {
 }
 
 
-const useTabs = () => {
+export default function Tabs() {
     const [tabs, setTabs] = useState([]);
     const [query, setQuery] = useState('');
     const {internalTabs, refreshInternalTabs} = useInternalTabs();
@@ -81,26 +81,19 @@ const useTabs = () => {
         loader.wrappedLoader()
     }, []);
 
-    return {tabs, query, setQuery, isSearching: loader.isLoading, refreshTabs: loader.wrappedLoader}
-}
-
-
-export default function Tabs() {
-    const {tabs, query, setQuery, isSearching, refreshTabs} = useTabs();
-
     return (
         <div className="tabs">
             <TabsSearch
                 query={query}
                 setQuery={setQuery}
-                isSearching={isSearching}
-                refreshTabs={refreshTabs}
+                isSearching={loader.isLoading}
+                refreshTabs={loader.wrappedLoader}
             />
             <table>
                 <tbody>
                     {
                         tabs.map((tab, index) => {
-                            return <Tab tab={tab} refreshTabs={refreshTabs} key={index}/>
+                            return <Tab tab={tab} refreshTabs={loader.wrappedLoader} key={index}/>
                         })
                     }
                 </tbody>
