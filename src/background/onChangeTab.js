@@ -52,7 +52,7 @@ const deleteNotInvitedSites = async () => {
 
 const deleteDuplicatedTabs = async () => {
     console.log('deleteDuplicatedTabs started');
-	let tabs = await chrome.tabs.query();
+	let tabs = await chrome.tabs.query({});
 	tabs.sort(tabComparator);
 
 	while(tabs.length) {

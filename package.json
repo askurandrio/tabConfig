@@ -29,7 +29,7 @@
     "zip-webpack-plugin": "^4.0.1"
   },
   "scripts": {
-    "build": "NODE_ENV=development webpack --mode development --config webpack.js",
+    "build": "NODE_ENV=development webpack --devtool source-map --mode development --config webpack.js",
     "watch": "NODE_ENV=development npm-watch"
   },
   "watch": {
