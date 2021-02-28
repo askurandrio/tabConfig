@@ -5,14 +5,13 @@
     "alarms",
     "storage"
   ],
-  "icons": {                   
+  "icons": {
     "19": "icon.png",
     "38": "icon.png",
     "48": "icon.png",
-    "128": "icon.png"  
-  }, 
+    "128": "icon.png"
+  },
   "name": "TabConfig",
-  "version": "0.2.0",
   "manifest_version": 2,
   "background": {
     "scripts": [
@@ -21,11 +20,11 @@
   },
   "browser_action": {
     "default_popup": "index.html",
-    "default_icon": {                
+    "default_icon": {
       "19": "icon.png",
       "38": "icon.png",
       "48": "icon.png",
-      "128": "icon.png"  
+      "128": "icon.png"
     }
   },
   "content_security_policy": "script-src 'self'; object-src 'self'",

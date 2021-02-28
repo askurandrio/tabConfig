@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 
 export const useLoader = (loader, isMounted) => {
@@ -17,6 +17,31 @@ export const useLoader = (loader, isMounted) => {
     }
 
     return {isLoading, wrappedLoader}
+}
+
+
+export const useStorageStatus = (read, write, changeStatus) => {
+    const [status, setStatus] = useState('init');
+    if(!changeStatus) {
+        changeStatus = setStatus;
+    }
+    useEffect(
+        async () => {
+            if(status === 'init') {
+                await read();
+                changeStatus('ready');
+                return
+            }
+            if(status === 'save') {
+                await write();
+                changeStatus('ready');
+                return
+            }
+        },
+        [status]
+    )
+
+    return [status, setStatus]
 }
 
 

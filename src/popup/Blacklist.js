@@ -1,33 +1,34 @@
 /* global chrome */
 
-import React, {useEffect, useState} from 'react';
-import {makeLoader} from "./utils";
+import React, {useState} from 'react';
+import {makeLoader, useStorageStatus} from "./utils";
 
 
 function SaveButton(props) {
-    const [saveText, setSaveText] = useState('Initialization...');
-
-    useEffect(
-         () => {
-            if(saveText === 'Initialization...') {
-                props.read().then(() => setSaveText('Save'));
-                return
-            }
-            if(saveText === 'Saving') {
-                props.save().then(() => props.read()).then(() => setSaveText('Saved'));
-                return;
-            }
-            if(saveText === 'Saved') {
-                setTimeout(() => setSaveText('Save'), 1000)
-                return;
-            }
-        },
-        [saveText]
-    )
+    const changeStatus = (newStatus) => {
+        if((status === 'save') && (newStatus === 'ready')) {
+            setStatus('saved');
+            return
+        }
+        if(newStatus === 'saved') {
+            setTimeout(() => setStatus('ready'), 1000)
+            return;
+        }
+        setStatus(newStatus);
+    }
+    const getButtonText = (status) => {
+        return {
+            'init': 'Initialization...',
+            'ready': 'Save',
+            'save': 'Saving...',
+            'saved': 'Saved'
+        }[status]
+    }
+    const [status, setStatus] = useStorageStatus(props.read, props.write, changeStatus);
 
     return (
-        <button onClick={() => setSaveText('Saving')} disabled={saveText !== 'Save'}>
-            {saveText} {['Initialization...', 'Saving'].includes(saveText) ? makeLoader(): ''}
+        <button onClick={() => setStatus('save')} disabled={status !== 'save'}>
+            {getButtonText(status)} {status === 'ready' ? '': makeLoader()}
         </button>
     )
 }

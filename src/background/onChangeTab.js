@@ -66,6 +66,9 @@ const deleteDuplicatedTabs = async () => {
 			if(first.active) {
 				return -1
 			}
+			if(first.audible && (!second.active)) {
+				return -1
+			}
 			return 1
 		});
 		const tabIdsForRemove = duplicatedTabs.slice(1).map(tab => tab.id);

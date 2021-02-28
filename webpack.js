@@ -5,6 +5,7 @@ const WebpackExtensionManifestPlugin = require('webpack-extension-manifest-plugi
 const CopyPlugin = require('copy-webpack-plugin');
 const fs = require('fs');
 const yazl = require('yazl');
+const package = require('./package.json');
 
 
 module.exports = {
@@ -27,7 +28,10 @@ module.exports = {
     }),
     new WebpackExtensionManifestPlugin({
       config: {
-        base: baseManifest
+        base: baseManifest,
+        extend: {
+            version: package.version
+        }
       }
     }),
     new CopyPlugin({

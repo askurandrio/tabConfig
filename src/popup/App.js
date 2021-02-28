@@ -1,5 +1,6 @@
 /* global chrome */
 
+import 'chrome-extension-async';
 import React, {useState} from 'react';
 import './App.scss';
 import Tabs from "./Tabs";
