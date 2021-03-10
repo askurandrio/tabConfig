@@ -81,7 +81,6 @@ const SearchIcon = () => {
 
 
 function useHints() {
-    const [hintsInfo, setHintsInfo] = useState(null);
     const [hints, setHints] = useState([]);
 
     const updateHints = (hintsInfo) => {
@@ -97,6 +96,7 @@ function useHints() {
         })
         newHints = newHints.map(hint => hint[0])
         newHints = newHints.filter(hint => hint)
+        newHints = newHints.slice(0, 10);
         setHints(newHints)
     }
 

@@ -1,59 +1,36 @@
 /* global chrome */
 
 import React, {useState} from 'react';
-import {makeLoader, useStorageStatus} from "./utils";
-
-
-function SaveButton(props) {
-    const changeStatus = (newStatus) => {
-        if((status === 'save') && (newStatus === 'ready')) {
-            setStatus('saved');
-            return
-        }
-        if(newStatus === 'saved') {
-            setTimeout(() => setStatus('ready'), 1000)
-            return;
-        }
-        setStatus(newStatus);
-    }
-    const getButtonText = (status) => {
-        return {
-            'init': 'Initialization...',
-            'ready': 'Save',
-            'save': 'Saving...',
-            'saved': 'Saved'
-        }[status]
-    }
-    const [status, setStatus] = useStorageStatus(props.read, props.write, changeStatus);
-
-    return (
-        <button onClick={() => setStatus('save')} disabled={status !== 'save'}>
-            {getButtonText(status)} {status === 'ready' ? '': makeLoader()}
-        </button>
-    )
-}
+import {makeLoader, useAsyncInit} from "./utils";
+import {getBlocklist} from "../generic/utils";
 
 
 export default function Blacklist() {
     const [blocklist, setBlockList] = useState([]);
-    const read = async () => {
-        const storage = await new Promise(resolve => {
-            chrome.storage.sync.get(['blocklist'], resolve)
-        });
-        const blocklist = storage.blocklist || [];
-        setBlockList(blocklist);
-    }
-    const save = async () => {
-        const filteredBlocklist = blocklist.filter((row) => row);
-        await new Promise(resolve => {
-            chrome.storage.sync.set({blocklist: filteredBlocklist}, resolve)
-        });
-        await chrome.extension.getBackgroundPage().reloadSettings()
-    }
+    useAsyncInit(async () => {
+        const settingsBlocklist = await getBlocklist();
+        setBlockList(settingsBlocklist);
+        setButtonText('Save');
+    });
+    const [buttonText, setButtonText] = useState('Initialization...');
 
     return (
         <div className="blacklist">
-            <SaveButton read={read} save={save}/>
+            <button
+                onClick={async () => {
+                    setButtonText('Saving');
+                    const filteredBlocklist = blocklist.filter((row) => row);
+                    await chrome.storage.sync.set({blocklist: filteredBlocklist});
+                    await chrome.extension.getBackgroundPage().reloadSettings()
+                    setBlockList(filteredBlocklist);
+                    setButtonText('Saved');
+                    await new Promise(resolve =>  setTimeout(resolve, 1500));
+                    setButtonText('Save');
+                }}
+                disabled={buttonText !== 'Save'}
+            >
+                {buttonText} {(buttonText === 'Save') ? '': makeLoader()}
+            </button>
             {
                 blocklist.map((row, idx) => {
                     return (
@@ -72,8 +49,24 @@ export default function Blacklist() {
                     )
                 })
             }
-            <button onClick={() => setBlockList([...blocklist, ''])}>
+            <button
+                onClick={() => setBlockList([...blocklist, ''])}
+                disabled={buttonText !== 'Save'}
+            >
                 Add
+            </button>
+            <button
+                onClick={async () => {
+                    const tabs = await chrome.tabs.query({
+                        active: true, windowId: chrome.windows.WINDOW_ID_CURRENT
+                    });
+                    const activeTab = tabs[0];
+                    const host = activeTab.url ? ((new URL(activeTab.url)).hostname) : activeTab.url
+                    setBlockList([...blocklist, host])
+                }}
+                disabled={buttonText !== 'Save'}
+            >
+                Add this site
             </button>
         </div>
     )

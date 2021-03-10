@@ -20,28 +20,19 @@ export const useLoader = (loader, isMounted) => {
 }
 
 
-export const useStorageStatus = (read, write, changeStatus) => {
-    const [status, setStatus] = useState('init');
-    if(!changeStatus) {
-        changeStatus = setStatus;
-    }
+export const useAsyncInit = (init) => {
+    const [isInitialization, setIsInitialization] = useState(true);
+
     useEffect(
-        async () => {
-            if(status === 'init') {
-                await read();
-                changeStatus('ready');
-                return
-            }
-            if(status === 'save') {
-                await write();
-                changeStatus('ready');
-                return
-            }
+        () => {
+            init().then(() => {
+                setIsInitialization(false)
+            })
         },
-        [status]
+        []
     )
 
-    return [status, setStatus]
+    return {isInitialization}
 }
 
 

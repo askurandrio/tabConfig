@@ -2,6 +2,7 @@
 import 'chrome-extension-async';
 import {onChangeTab, setBlocklist} from './onChangeTab';
 import {getBlocklist} from '../generic/utils';
+import onActivatedTab from "./onActivatedTab";
 
 
 window.reloadSettings = async () => {
@@ -10,6 +11,13 @@ window.reloadSettings = async () => {
 }
 
 
+const onTabChange = tab => {
+	onChangeTab();
+	onActivatedTab(tab);
+}
+
+
 window.reloadSettings();
-chrome.tabs.onCreated.addListener(onChangeTab);
-chrome.tabs.onUpdated.addListener(onChangeTab);
+chrome.tabs.onCreated.addListener(onTabChange);
+chrome.tabs.onUpdated.addListener(onTabChange);
+chrome.tabs.onActivated.addListener((tabInfo) => onTabChange({id: tabInfo.tabId}));

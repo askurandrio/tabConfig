@@ -5,6 +5,7 @@ import React, {useState} from 'react';
 import './App.scss';
 import Tabs from "./Tabs";
 import Blacklist from "./Blacklist";
+import History from "./History";
 
 
 export default function App() {
@@ -12,14 +13,27 @@ export default function App() {
 
     return (
         <div className="app">
-            <button onClick={() => setMode('tabs')} disabled={mode === 'tabs'}>
+            <button
+                onClick={() => setMode('tabs')}
+                disabled={mode === 'tabs'}
+            >
                 Tabs
             </button>
-            <button onClick={() => setMode('blacklist')} disabled={mode === 'blacklist'}>
+            <button
+                onClick={() => setMode('blacklist')}
+                disabled={mode === 'blacklist'}
+            >
                 Blacklist
+            </button>
+            <button
+                onClick={() => setMode('activationHistory')}
+                disabled={mode === 'activationHistory'}
+            >
+                Activation history
             </button>
             {mode === 'tabs' ? <Tabs/>: ''}
             {mode === 'blacklist' ? <Blacklist/>: ''}
+            {mode === 'activationHistory' ? <History/>: ''}
         </div>
     )
 }

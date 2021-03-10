@@ -26,6 +26,7 @@
     "webpack-dev-server": "^3.11.2",
     "webpack-extension-manifest-plugin": "^0.6.0",
     "webpack-zip-plugin": "^0.1.6",
+    "yazl": "^2.5.1",
     "zip-webpack-plugin": "^4.0.1"
   },
   "scripts": {

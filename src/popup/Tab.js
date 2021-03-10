@@ -42,9 +42,10 @@ function TabClose(props) {
     const isMounted = useIsMounted()
     const {isLoading, wrappedLoader} = useLoader(
         async () => {
-            await props.onTabAction.onAction();
+            if (props.onTabAction) {
+                await props.onTabAction.onAction();
+            }
             await chrome.tabs.remove(props.tab.id);
-            await props.refreshTabs();
         },
         isMounted
     )
@@ -67,7 +68,9 @@ function TabClose(props) {
 
 export default function Tab(props) {
     const markTabAsActive = useLoader(async () => {
-        await props.onTabAction.onAction();
+        if (props.onTabAction) {
+            await props.onTabAction.onAction();
+        }
         await chrome.tabs.update(props.tab.id, {active: true});
     })
 
@@ -81,7 +84,7 @@ export default function Tab(props) {
             </td>
             <td>
                 <TabOpen markTabAsActive={markTabAsActive}/>
-                <TabClose tab={props.tab} refreshTabs={props.refreshTabs} onTabAction={props.onTabAction}/>
+                <TabClose tab={props.tab} onTabAction={props.onTabAction}/>
             </td>
         </tr>
     )

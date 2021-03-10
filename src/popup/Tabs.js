@@ -9,9 +9,7 @@ import {useLoader} from "./utils";
 const useInternalTabs = () => {
     const [internalTabs, setInternalTabs] = useState([]);
     const refreshInternalTabs = async () => {
-        const tabs = await new Promise(resolve => {
-            chrome.tabs.query({}, (tabs) => resolve(tabs))
-        });
+        const tabs = await chrome.tabs.query({});
         setInternalTabs(tabs);
     }
 
@@ -63,6 +61,7 @@ export default function Tabs() {
     }, [tabsFilter, internalTabs]);
     const loader = useLoader(() => refreshInternalTabs())
 
+    onTabAction.subscribe(loader.wrappedLoader);
     useEffect(() => {
         loader.wrappedLoader()
     }, []);

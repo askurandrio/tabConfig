@@ -15,20 +15,17 @@ const tabComparator = (firstTab, secondTab) => {
 }
 
 
-const [isHostBlocked, setBlocklist] = (() => {
-	let blocklist = [];
+let blocklist = [];
 
-	const isHostBlocked = (host) => {
-		return blocklist.includes(host)
-	}
 
-	const setBlocklist = async (newBlocklist) => {
-		blocklist = newBlocklist;
-		await deleteNotInvitedSites();
-	}
+const isHostBlocked = (host) => {
+	return blocklist.includes(host)
+}
 
-	return [isHostBlocked, setBlocklist]
-})();
+export const setBlocklist = async (newBlocklist) => {
+	blocklist = newBlocklist;
+	await deleteNotInvitedSites();
+}
 
 
 const deleteNotInvitedSites = async () => {
@@ -42,9 +39,7 @@ const deleteNotInvitedSites = async () => {
 		if(!isHostBlocked(new URL(tab.url).host)) {
 			continue
 		}
-		await new Promise(resolve => {
-			chrome.tabs.remove(tab.id, resolve);
-		})
+		await chrome.tabs.remove(tab.id);
 	}
 
     console.log('deleteNotInvitedSites done');
@@ -52,29 +47,35 @@ const deleteNotInvitedSites = async () => {
 
 const deleteDuplicatedTabs = async () => {
     console.log('deleteDuplicatedTabs started');
-	let tabs = await chrome.tabs.query({});
-	tabs.sort(tabComparator);
 
-	while(tabs.length) {
-		const currentTab = tabs[0];
-		const duplicatedTabs = tabs.filter((tab) => tab.url === currentTab.url);
-		tabs = tabs.filter((tab) => tab.url !== currentTab.url);
-		if(duplicatedTabs.length === 1) {
-			continue
+	for(const window of await chrome.windows.getAll({})) {
+		let tabs = await chrome.tabs.query({windowId: window.id});
+		tabs.sort(tabComparator);
+
+		while(tabs.length) {
+			const currentTab = tabs[0];
+			const duplicatedTabs = tabs.filter((tab) => tab.url === currentTab.url);
+			tabs = tabs.filter((tab) => tab.url !== currentTab.url);
+			if(duplicatedTabs.length === 1) {
+				continue
+			}
+			duplicatedTabs.sort((first, second) => {
+				if(first.active) {
+					return -1
+				}
+				if(first.audible && (!second.active)) {
+					return -1
+				}
+				return 1
+			});
+			for(const tab of duplicatedTabs.slice(1)) {
+				try {
+					await chrome.tabs.remove([tab.id]);
+				} catch (ex) {
+					console.error([ex, tab]);
+				}
+			}
 		}
-		duplicatedTabs.sort((first, second) => {
-			if(first.active) {
-				return -1
-			}
-			if(first.audible && (!second.active)) {
-				return -1
-			}
-			return 1
-		});
-		const tabIdsForRemove = duplicatedTabs.slice(1).map(tab => tab.id);
-		await new Promise(resolve => {
-			chrome.tabs.remove(tabIdsForRemove, resolve);
-		})
 	}
 
     console.log('deleteDuplicatedTabs done');
@@ -87,12 +88,15 @@ const groupTabs = async () => {
 		const tabs = await chrome.tabs.query({windowId: window.id});
 		tabs.sort(tabComparator);
 		for(const [index, tab] of tabs.entries()) {
-			if (tab.index == index) {
+			if (tab.index === index) {
 				continue;
 			}
-			await new Promise((resolve) => {
-				chrome.tabs.move(tab.id, {index}, () => resolve())
-			});
+			try {
+				await chrome.tabs.move(tab.id, {index});
+			} catch (ex) {
+				console.error([ex, tab]);
+			}
+
 		}
 	}
     console.log('groupTabs done');
@@ -106,38 +110,25 @@ const organizeTabs = async () => {
 }
 
 
-const onChangeTab = (() => {
-	let queue = Promise.resolve();
+let queue = Promise.resolve();
 
-	chrome.alarms.onAlarm.addListener((alarm) => {
-		if(alarm.name !== 'onAction') {
-			return
-		}
-		queue = queue.then(() => organizeTabs())
-	})
-
-	const onAction = async () => {
-		const existingAlarm = await new Promise((resolve) => {
-			chrome.alarms.get('onAction', resolve)
-		});
-		if(existingAlarm) {
-			await new Promise((resolve) => {
-				chrome.alarms.clear('onAction', resolve)
-			});
-		}
-		chrome.alarms.create('onAction', {when: Date.now() + 1250})
+chrome.alarms.onAlarm.addListener((alarm) => {
+	if(alarm.name !== 'onAction') {
+		return
 	}
+	queue = queue.then(() => organizeTabs())
+});
 
-	const addOnActionToQueue = () => {
-		queue = queue.then(() => onAction())
+
+const onAction = async () => {
+	const existingAlarm = await chrome.alarms.get('onAction');
+	if(existingAlarm) {
+		await chrome.alarms.clear('onAction')
 	}
-
-	addOnActionToQueue();
-	return addOnActionToQueue;
-})();
+	chrome.alarms.create('onAction', {when: Date.now() + 1250})
+}
 
 
-export {
-	onChangeTab,
-	setBlocklist
-};
+export const onChangeTab = () => {
+	queue = queue.then(() => onAction())
+}
