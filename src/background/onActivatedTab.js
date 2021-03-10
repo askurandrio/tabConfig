@@ -1,17 +1,17 @@
-import {getHistory} from "../generic/utils";
+import {getHistory, syncFunction} from "../generic/utils";
 
 
-let queue = Promise.resolve()
-
-
-const _onActivatedTab = async (tab) => {
-    let activationHistory = await getHistory();
-    activationHistory = activationHistory.filter(historyTab => historyTab.id !== tab.id)
-    activationHistory = [tab, ...activationHistory];
-    await chrome.storage.local.set({activationHistory});
-}
-
-
-export default function (tab) {
-    queue = queue.then(() => _onActivatedTab(tab))
-}
+export const onActivatedTab = syncFunction(async (tab) => {
+    let history = await getHistory();
+    history = history.filter(historyTab => {
+        if(historyTab.id !== tab.id) {
+            return true
+        }
+        if(historyTab.url !== tab.url) {
+            return true
+        }
+        return false
+    })
+    history = [tab, ...history];
+    await chrome.storage.local.set({history});
+})

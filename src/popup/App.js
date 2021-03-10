@@ -26,14 +26,14 @@ export default function App() {
                 Blacklist
             </button>
             <button
-                onClick={() => setMode('activationHistory')}
-                disabled={mode === 'activationHistory'}
+                onClick={() => setMode('history')}
+                disabled={mode === 'history'}
             >
-                Activation history
+                History
             </button>
             {mode === 'tabs' ? <Tabs/>: ''}
             {mode === 'blacklist' ? <Blacklist/>: ''}
-            {mode === 'activationHistory' ? <History/>: ''}
+            {mode === 'history' ? <History/>: ''}
         </div>
     )
 }

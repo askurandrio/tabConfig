@@ -1,5 +1,7 @@
 /* global chrome */
 
+import {syncFunction} from "../generic/utils";
+
 const tabComparator = (firstTab, secondTab) => {
 	const firstTabUrl = firstTab.url || '';
 	const secondTabUrl = secondTab.url || '';
@@ -103,32 +105,25 @@ const groupTabs = async () => {
 };
 
 
-const organizeTabs = async () => {
+const organizeTabs = syncFunction(async () => {
 	await deleteNotInvitedSites();
 	await deleteDuplicatedTabs();
 	await groupTabs();
-}
+});
 
-
-let queue = Promise.resolve();
 
 chrome.alarms.onAlarm.addListener((alarm) => {
 	if(alarm.name !== 'onAction') {
 		return
 	}
-	queue = queue.then(() => organizeTabs())
+	organizeTabs();
 });
 
 
-const onAction = async () => {
+export const onChangeTab = syncFunction(async () => {
 	const existingAlarm = await chrome.alarms.get('onAction');
 	if(existingAlarm) {
 		await chrome.alarms.clear('onAction')
 	}
 	chrome.alarms.create('onAction', {when: Date.now() + 1250})
-}
-
-
-export const onChangeTab = () => {
-	queue = queue.then(() => onAction())
-}
+});

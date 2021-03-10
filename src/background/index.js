@@ -1,8 +1,8 @@
 /* global chrome */
 import 'chrome-extension-async';
 import {onChangeTab, setBlocklist} from './onChangeTab';
-import {getBlocklist} from '../generic/utils';
-import onActivatedTab from "./onActivatedTab";
+import {getBlocklist, syncFunction} from '../generic/utils';
+import {onActivatedTab} from "./onActivatedTab";
 
 
 window.reloadSettings = async () => {
@@ -11,13 +11,19 @@ window.reloadSettings = async () => {
 }
 
 
-const onTabChange = tab => {
-	onChangeTab();
-	onActivatedTab(tab);
-}
+const onTabChange = syncFunction(async tab => {
+	await onChangeTab();
+	await onActivatedTab(tab);
+})
+
+
+const onTabInfo = syncFunction(async tabInfo => {
+	const tab = await chrome.tabs.get(tabInfo.tabId);
+	await onTabChange(tab)
+})
 
 
 window.reloadSettings();
 chrome.tabs.onCreated.addListener(onTabChange);
 chrome.tabs.onUpdated.addListener(onTabChange);
-chrome.tabs.onActivated.addListener((tabInfo) => onTabChange({id: tabInfo.tabId}));
+chrome.tabs.onActivated.addListener(onTabInfo);

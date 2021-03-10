@@ -4,7 +4,7 @@ import Tab from "./Tab";
 import {makeLoader, useAsyncInit} from "./utils";
 
 
-export default function History(props) {
+export default function History() {
     const [tabs, setTabs] = useState([]);
     const {isInitialization} = useAsyncInit(async () => {
         const tabsStorage = (await chrome.tabs.query({})).reduce(
