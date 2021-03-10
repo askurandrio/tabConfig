@@ -11,7 +11,8 @@ export const onActivatedTab = syncFunction(async (tab) => {
             return true
         }
         return false
-    })
+    });
+    history = history.slice(0, 1000);
     history = [tab, ...history];
     await chrome.storage.local.set({history});
 })
