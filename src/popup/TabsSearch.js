@@ -39,7 +39,11 @@ export class TabsFilter {
         if(tab.matchesTitle || tab.matchesUrl) {
             return true;
         }
-        if(this.query.startsWith(':a') && tab.active){
+        if(
+            this.query.startsWith(':a') &&
+            tab.active &&
+            (tab.windowId === chrome.windows.WINDOW_ID_CURRENT)
+        ) {
             return true
         }
         if(this.query.startsWith(':p') && tab.audible){

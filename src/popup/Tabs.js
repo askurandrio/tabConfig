@@ -3,26 +3,17 @@
 import React, { useState, useEffect } from 'react';
 import Tab from "./Tab";
 import {TabsFilter, TabsSearch} from "./TabsSearch";
-import {useLoader} from "./utils";
+import {useAsyncInit, useLoader} from "./utils";
 
 
 const useInternalTabs = () => {
-    const [internalTabs, setInternalTabs] = useState([]);
     const refreshInternalTabs = async () => {
         const tabs = await chrome.tabs.query({});
         setInternalTabs(tabs);
     }
 
-    useEffect(() => {
-        let queue = refreshInternalTabs();
-        const intervalId = setInterval(
-            () => queue = queue.then(() => refreshInternalTabs()),
-            2000
-        );
-        return () => {
-            clearInterval(intervalId);
-        }
-    }, []);
+    const [internalTabs, setInternalTabs] = useState([]);
+    useAsyncInit(refreshInternalTabs);
 
     return {internalTabs, refreshInternalTabs}
 }
@@ -61,9 +52,9 @@ export default function Tabs() {
     }, [tabsFilter, internalTabs]);
     const loader = useLoader(() => refreshInternalTabs())
 
-    onTabAction.subscribe(loader.wrappedLoader);
     useEffect(() => {
         loader.wrappedLoader()
+        return onTabAction.subscribe(loader.wrappedLoader)
     }, []);
 
     return (

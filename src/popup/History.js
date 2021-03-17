@@ -7,17 +7,8 @@ import {makeLoader, useAsyncInit} from "./utils";
 export default function History() {
     const [tabs, setTabs] = useState([]);
     const {isInitialization} = useAsyncInit(async () => {
-        const tabsStorage = (await chrome.tabs.query({})).reduce(
-            (previousStorage, tab) => {
-                return {
-                    [tab.id]: tab,
-                    ...previousStorage
-                }
-            },
-            {}
-        );
         const activationHistory = await getHistory();
-        setTabs(activationHistory.map(tab => tabsStorage[tab.id] || tab));
+        setTabs(activationHistory);
     })
 
     if(isInitialization) {

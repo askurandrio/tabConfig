@@ -21,10 +21,10 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 
-export const onChangeTab = async () => {
+export const onChangeTab = syncFunction(async () => {
 	const existingAlarm = await chrome.alarms.get('onAction');
 	if(existingAlarm) {
 		await chrome.alarms.clear('onAction')
 	}
 	chrome.alarms.create('onAction', {when: Date.now() + 1250})
-}
+})

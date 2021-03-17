@@ -1,6 +1,6 @@
 {
   "name": "TabConfig",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.12.10",
@@ -38,7 +38,7 @@
       "patterns": [
         "src",
         "webpack.js",
-        "public"
+        "package.json"
       ],
       "extensions": "*",
       "quiet": false
