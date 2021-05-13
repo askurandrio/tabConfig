@@ -1,16 +1,4 @@
-const tabComparator = (firstTab, secondTab) => {
-	const firstTabUrl = firstTab.url || '';
-	const secondTabUrl = secondTab.url || '';
-	if((!firstTabUrl) || (!secondTabUrl)) {
-		return firstTabUrl.localeCompare(secondTabUrl)
-	}
-	if (new URL(firstTabUrl).host !== new URL(secondTabUrl).host) {
-		return firstTabUrl.localeCompare(secondTabUrl)
-	}
-	const firstTabTitle = firstTab.title || '';
-	const secondTabTitle = secondTab.title || '';
-	return firstTabTitle.localeCompare(secondTabTitle)
-}
+import {tabComparator} from './utils'
 
 
 export const groupTabs = async () => {
@@ -18,7 +6,14 @@ export const groupTabs = async () => {
 
 	for(const window of await chrome.windows.getAll({})) {
 		const tabs = await chrome.tabs.query({windowId: window.id});
-		tabs.sort(tabComparator);
+		tabs.sort((firstTab, secondTab) => {
+			return tabComparator(
+				(first, second) => first.localCompare(second),
+				firstTab,
+				secondTab
+			)
+		});
+
 		for(const [index, tab] of tabs.entries()) {
 			if (tab.index === index) {
 				continue;

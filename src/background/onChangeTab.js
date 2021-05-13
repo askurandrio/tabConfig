@@ -1,13 +1,11 @@
 /* global chrome */
 
 import {syncFunction} from "../generic/utils";
-import {deleteNotInvitedSites} from "./deleteNotInvitedSites";
 import {deleteDuplicatedTabs} from "./deleteDuplicatedTabs";
 import {groupTabs} from "./groupTabs";
 
 
 const organizeTabs = syncFunction(async () => {
-	await deleteNotInvitedSites();
 	await deleteDuplicatedTabs();
 	await groupTabs();
 });

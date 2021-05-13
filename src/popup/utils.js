@@ -1,41 +1,63 @@
 import React, {useEffect, useState} from 'react';
+import {useIsMounted} from "react-tidy";
 
 
-export const useLoader = (loader, isMounted) => {
-    if(isMounted === undefined) {
-        isMounted = true
+export const LoadComponent = (props) => {
+    if(!props.isLoading) {
+        return props.children
     }
+
+    return (
+        <div
+            className="loading"
+            style={{
+                backgroundImage: chrome.runtime.getURL('spinner.svg')
+            }}
+        >
+            {props.children}
+        </div>
+    )
+}
+
+
+export const useLoader = (loader) => {
+    const isMounted = useIsMounted();
     const [isLoading, setIsLoading] = useState(false);
 
     const wrappedLoader = async (...args) => {
         setIsLoading(true);
-        await loader(...args);
+        try {
+            await loader(...args);
+        } catch(ex) {
+            alert(ex)
+        }
 
         if(isMounted) {
             setIsLoading(false)
         }
     }
 
-    return {isLoading, wrappedLoader}
+    const component = (props) => {
+        return (
+            <LoadComponent isLoading={isLoading}>
+                {props.children}
+            </LoadComponent>
+        )
+    }
+
+    return [wrappedLoader, component]
 }
 
 
 export const useAsyncInit = (init) => {
-    const [isInitialization, setIsInitialization] = useState(true);
+    const [wrappedInit, InitComponent] = useLoader(init);
 
     useEffect(
         () => {
-            init().then(() => {
-                setIsInitialization(false)
-            })
+            wrappedInit()
         },
         []
     )
 
-    return {isInitialization}
-}
-
-
-export const makeLoader = () => {
-    return <img className="loader" src={chrome.runtime.getURL('spinner.svg')}/>
+    return [InitComponent]
 }

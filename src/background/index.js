@@ -2,18 +2,20 @@
 import 'chrome-extension-async';
 import {onChangeTab} from './onChangeTab';
 import {onActivatedTab} from "./onActivatedTab";
-import {reloadBlocklistSettings} from "./deleteNotInvitedSites";
+import {deleteNotInvitedSites, reloadBlackListSettings} from "./deleteNotInvitedSites";
+import {syncFunction} from "../generic/utils";
 
 
 window.reloadSettings = async () => {
-	await reloadBlocklistSettings()
+	await reloadBlackListSettings()
 }
 
 
-const onTabChange = tab => {
-	onChangeTab();
-	onActivatedTab(tab);
-}
+const onTabChange = syncFunction(async tab => {
+	await deleteNotInvitedSites();
+	await onChangeTab();
+	await onActivatedTab(tab);
+})
 
 
 const onTabInfo = tabInfo => {

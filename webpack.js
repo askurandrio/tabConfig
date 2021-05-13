@@ -10,7 +10,7 @@ const package = require('./package.json');
 
 module.exports = {
   mode: 'development',
-  devtool: 'cheap-module-source-map',
+  devtool: null,
   entry: {
     popup: path.join(__dirname, './src/popup/index.js'),
     background: path.join(__dirname, './src/background/index.js'),
@@ -36,6 +36,7 @@ module.exports = {
     }),
     new CopyPlugin({
       patterns: [
+        { from: 'src/background/background.html', to: 'background.html' },
         { from: 'src/resources/icon.png', to: 'icon.png' },
         { from: 'src/resources/spinner.svg', to: 'spinner.svg' },
       ]

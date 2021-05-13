@@ -1,8 +1,8 @@
 /* global chrome */
 
-export const getBlocklist = async () => {
-    const storage = await chrome.storage.sync.get(['blocklist']);
-    return storage.blocklist || [];
+export const getBlackList = async () => {
+    const storage = await chrome.storage.sync.get(['blackList']);
+    return storage.blackList || [];
 };
 
 

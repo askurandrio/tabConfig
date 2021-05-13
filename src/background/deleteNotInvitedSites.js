@@ -1,16 +1,16 @@
-import {getBlocklist} from "../generic/utils";
+import {getBlackList} from "../generic/utils";
 
 
-let blocklist = [];
+let blackList = [];
 
 
 const isHostBlocked = (host) => {
-	return blocklist.includes(host)
+	return blackList.includes(host)
 }
 
 
-export const reloadBlocklistSettings = async () => {
-	blocklist = await getBlocklist();
+export const reloadBlackListSettings = async () => {
+	blackList = await getBlackList();
 	await deleteNotInvitedSites();
 }
 

@@ -1,3 +1,6 @@
+import {tabComparator} from './utils'
+
+
 export const deleteDuplicatedTabs = async () => {
     console.log('deleteDuplicatedTabs started');
 
@@ -5,9 +8,13 @@ export const deleteDuplicatedTabs = async () => {
 		let tabs = await chrome.tabs.query({windowId: window.id});
 
 		while(tabs.length) {
-			const currentTab = tabs[0];
-			const duplicatedTabs = tabs.filter((tab) => tab.url === currentTab.url);
-			tabs = tabs.filter((tab) => tab.url !== currentTab.url);
+			const duplicatedTabs = tabs.filter(tab => {
+				return tabComparator(
+					(first, second) => first === second,
+					tabs[0],
+					tab
+				)
+			});
 			if(duplicatedTabs.length === 1) {
 				continue
 			}
