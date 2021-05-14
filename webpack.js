@@ -9,7 +9,7 @@ const package = require('./package.json');
 
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   devtool: null,
   entry: {
     popup: path.join(__dirname, './src/popup/index.js'),
