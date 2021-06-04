@@ -17,13 +17,17 @@ export const reloadBlackListSettings = async () => {
 
 export const deleteNotInvitedSites = async () => {
     console.log('deleteNotInvitedSites started');
-
+	const regex = new RegExp(
+		`[${String.fromCharCode(1072)}-${String.fromCharCode(1103)}]`,
+		'g'
+	)
 	const tabs = await chrome.tabs.query({});
+
 	for(const tab of tabs) {
-		if(!tab.url) {
+		if(!tab.title) {
 			continue
 		}
-		if(!isHostBlocked(new URL(tab.url).host)) {
+		if(!tab.title.toLowerCase().match(regex)) {
 			continue
 		}
 		await chrome.tabs.remove(tab.id);

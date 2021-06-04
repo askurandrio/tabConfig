@@ -7,11 +7,11 @@ export const deleteDuplicatedTabs = async () => {
 	for(const window of await chrome.windows.getAll({})) {
 		let tabs = await chrome.tabs.query({windowId: window.id});
 
-		while(tabs.length) {
+		for(const currentTab of tabs) {
 			const duplicatedTabs = tabs.filter(tab => {
 				return tabComparator(
 					(first, second) => first === second,
-					tabs[0],
+					currentTab,
 					tab
 				)
 			});

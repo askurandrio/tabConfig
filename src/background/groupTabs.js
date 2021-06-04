@@ -8,7 +8,7 @@ export const groupTabs = async () => {
 		const tabs = await chrome.tabs.query({windowId: window.id});
 		tabs.sort((firstTab, secondTab) => {
 			return tabComparator(
-				(first, second) => first.localCompare(second),
+				(first, second) => first.localeCompare(second),
 				firstTab,
 				secondTab
 			)
