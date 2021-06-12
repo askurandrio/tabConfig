@@ -115,7 +115,7 @@ class FilteredTabsStorage {
 
     setQuery(query) {
         this.query = query;
-        this.refreshTabs();
+        this.tabsStorage.refreshTabs();
     }
 }
 

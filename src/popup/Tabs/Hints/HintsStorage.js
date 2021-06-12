@@ -17,6 +17,7 @@ class HintsStorage {
     }
 
     async addHint(hint) {
+        debugger;
         if (!hint) {
             return
         }

@@ -1,12 +1,12 @@
 import React from "react";
-import {tabsStorage} from "../TabsStorage";
+import {filteredTabsStorage} from "../TabsStorage";
 import {hintsStorage} from "./HintsStorage";
 import {observer} from "mobx-react-lite";
 
 
 const Hint = observer((props) => {
     return (
-        <button onClick={() => tabsStorage.setQuery(props.hint)}>
+        <button onClick={() => filteredTabsStorage.setQuery(props.hint)}>
             {props.hint}
         </button>
     )

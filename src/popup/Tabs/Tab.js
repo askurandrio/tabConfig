@@ -1,16 +1,14 @@
 /* global chrome */
 import React from 'react';
 import {useLoader} from "../utils";
-import {tabsStorage} from "./TabsStorage";
+import {tabsStorage, filteredTabsStorage} from "./TabsStorage";
 import {hintsStorage} from "./Hints/HintsStorage";
 import {observer} from "mobx-react-lite";
 
 
 const openTab = async tab => {
-    await Promise.all([
-        hintsStorage.addHint(tabsStorage.query),
-        chrome.tabs.update(tab.id, {active: true})
-    ])
+    await hintsStorage.addHint(filteredTabsStorage.query);
+    await chrome.tabs.update(tab.id, {active: true})
 }
 
 
@@ -42,11 +40,9 @@ function TabOpen(props) {
 
 const TabClose = observer(props => {
     const [wrappedClose, CloseLoadComponent] = useLoader(async () => {
-        await Promise.all([
-            hintsStorage.addHint(tabsStorage.query),
-            chrome.tabs.remove(props.tab.id)
-        ])
-        await tabsStorage.refreshTabs();
+        await hintsStorage.addHint(tabsStorage.query);
+        await chrome.tabs.remove(props.tab.id);
+        tabsStorage.refreshTabs();
     });
 
     return (
