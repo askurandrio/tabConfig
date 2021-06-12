@@ -1,10 +1,10 @@
-import { runInAction, makeAutoObservable } from "mobx";
+import { runInAction, makeAutoObservable, autorun } from "mobx";
 
 
 class TabsFilter {
-    async init(query) {
+    constructor(query, currentWindow) {
         this.query = query;
-        this.currentWindow = await chrome.windows.getCurrent()
+        this.currentWindow = currentWindow
     }
 
     apply(tabs) {
@@ -60,27 +60,65 @@ class TabsFilter {
 
 class TabsStorage {
     tabs = []
-    query = ''
 
     constructor() {
         makeAutoObservable(this);
+    }
+
+    isTabExists(tab) {
+        const tabs = this.tabs.filter(storageTab => storageTab.id == tab.id);
+        if(!tabs.length) {
+            return false;
+        }
+
+        const storageTab = tabs[0];
+        if(
+            (tab.url && new URL(tab.url).host) !==
+            (storageTab.url && new URL(storageTab.url).host)
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    async refreshTabs() {
+        const tabs = await chrome.tabs.query({windowId: chrome.windows.WINDOW_ID_CURRENT});
+        runInAction(() => {
+            this.tabs = tabs
+        })
+    }
+}
+
+
+class FilteredTabsStorage {
+    tabsStorage = null;
+    currentWindow = null;
+    query = ''
+    tabs = [];
+
+    constructor(tabsStorage) {
+        this.tabsStorage = tabsStorage;
+        makeAutoObservable(this);
+
+        chrome.windows.getCurrent().then(currentWindow => {
+            runInAction(() => {
+                this.currentWindow = currentWindow
+            })
+        })
+
+        autorun(() => {
+            const tabFilter = new TabsFilter(this.query, this.currentWindow);
+            this.tabs = tabFilter.apply(this.tabsStorage.tabs)
+        })
     }
 
     setQuery(query) {
         this.query = query;
         this.refreshTabs();
     }
-
-    async refreshTabs() {
-        const allTabs = await chrome.tabs.query({windowId: chrome.windows.WINDOW_ID_CURRENT});
-        const tabFilter = new TabsFilter();
-        await tabFilter.init(this.query);
-        const filteredTabs = tabFilter.apply(allTabs);
-        runInAction(() => {
-            this.tabs = filteredTabs
-        })
-    }
 }
 
 
 export const tabsStorage = new TabsStorage();
+export const filteredTabsStorage = new FilteredTabsStorage(tabsStorage);

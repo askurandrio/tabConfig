@@ -4,7 +4,7 @@ import 'chrome-extension-async';
 import React, { useState, useEffect } from 'react';
 import './App.scss';
 import { Tabs } from "./Tabs/Tabs";
-import { tabsStorage } from './Tabs/TabsStorage';
+import { tabsStorage, filteredTabsStorage } from './Tabs/TabsStorage';
 import { hintsStorage } from './Tabs/Hints/HintsStorage';
 import { BlackList } from "./BlackList/BlackList";
 import { blackListStorage } from './BlackList/BlackListStorage';
@@ -25,7 +25,6 @@ export default function App() {
 
     return (
         <div className="app">
-            
             <button
                 onClick={() => setMode('tabs')}
                 disabled={mode === 'tabs'}

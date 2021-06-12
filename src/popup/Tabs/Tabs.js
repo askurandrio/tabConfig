@@ -1,10 +1,10 @@
 /* global chrome */
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import {Tab} from "./Tab";
 import {TabsSearch} from "./TabsSearch";
 import {observer} from "mobx-react-lite";
-import {tabsStorage} from "./TabsStorage";
+import {tabsStorage, filteredTabsStorage} from "./TabsStorage";
 
 
 export const Tabs = observer(() => {
@@ -14,8 +14,8 @@ export const Tabs = observer(() => {
             <table>
                 <tbody>
                     {
-                        tabsStorage.tabs.map((tab, index) => {
-                            return <Tab tab={tab} key={index}/>
+                        filteredTabsStorage.tabs.map((tab, index) => {
+                            return <Tab tab={tab} key={index} tabsStorage={tabsStorage}/>
                         })
                     }
                 </tbody>

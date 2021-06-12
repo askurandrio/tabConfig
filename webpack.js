@@ -81,7 +81,7 @@ module.exports = {
         use: ['babel-loader']
       },
       {
-        test: /\.s[ac]ss$/i,
+        test: /\.(sc|c)ss$/i,
         use: ['style-loader', 'css-loader', 'sass-loader']
       },
       {

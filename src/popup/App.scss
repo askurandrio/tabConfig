@@ -1,6 +1,11 @@
-.app {
-  width: 250px;
+html {
+  height: 0px;
 }
+
+.app {
+  max-width: 300px;
+}
+
 
 .tabs {
   table {
@@ -11,17 +16,32 @@
     border-bottom: 1px solid #b9acac;
   }
 
-  img {
-    max-width: 25px;
-    max-height: 25px;
+  a {
+    word-break: break-all;
+  }
+
+  .imageColumn {
+    width: 25px;
+    height: 25px;
+
+    img {
+      width: 25px;
+      height: 25px;
+    }
   }
 
   .linkColumn {
-    max-width: 170px;
+    width: 150px;
+    height: 10px;
+  }
+
+  .buttonsColumn {
+    width: 25px;
+    height: 10px;
   }
 
   .search-input {
-    width: 88%;
+    width: 78%;
     margin-right: 2%;
   }
 }
@@ -35,4 +55,11 @@
 
 .loading {
   pointer-events: none;
+}
+
+body {
+  margin-top: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
 }

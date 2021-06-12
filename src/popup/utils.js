@@ -29,7 +29,7 @@ export const useLoader = (loader) => {
         try {
             await loader(...args);
         } catch(ex) {
-            alert(ex)
+            console.log(ex)
         }
 
         if(isMounted) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import {observer} from "mobx-react-lite";
-import {tabsStorage} from "./TabsStorage";
+import {tabsStorage, filteredTabsStorage} from "./TabsStorage";
 import {Hints} from "./Hints/Hints";
 
 
@@ -30,9 +30,9 @@ const SearchIcon = () => {
 
 export const TabsSearch = observer(() => {
     return (
-        <>
+        <label>
             <input
-                value={tabsStorage.query}
+                value={filteredTabsStorage.query}
                 placeholder="Input title or url"
                 className="search-input"
                 onKeyDown={event => {
@@ -42,11 +42,11 @@ export const TabsSearch = observer(() => {
                     tabsStorage.refreshTabs();
                 }}
                 onChange={event => {
-                    tabsStorage.setQuery(event.target.value)
+                    filteredTabsStorage.setQuery(event.target.value)
                 }}
             />
             <SearchIcon/>
             <Hints/>
-        </>
+        </label>
     )
 })

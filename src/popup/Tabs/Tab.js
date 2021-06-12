@@ -20,7 +20,7 @@ function TabUrl(props) {
     return (
         <OpenLoadComponent>
             <a href={props.tab.url} onClick={wrappedOpen}>
-                {props.tab.title}
+                {props.tab.title.slice(0, 60)}
             </a>
         </OpenLoadComponent>
     )
@@ -46,6 +46,7 @@ const TabClose = observer(props => {
             hintsStorage.addHint(tabsStorage.query),
             chrome.tabs.remove(props.tab.id)
         ])
+        await tabsStorage.refreshTabs();
     });
 
     return (
@@ -60,16 +61,27 @@ const TabClose = observer(props => {
 
 export const Tab = observer(props => {
     return (
-        <tr>
-            <td>
-                <img src={props.tab.favIconUrl}/>
+        <tr data-debug-tab={JSON.stringify(props.tab)}>
+            <td className="imageColumn">
+                {
+                    props.tab.favIconUrl ?
+                    <img src={props.tab.favIconUrl}/> :
+                    ''
+                }
             </td>
             <td className="linkColumn">
                 <TabUrl tab={props.tab}/>
             </td>
-            <td>
-                <TabOpen tab={props.tab}/>
-                <TabClose tab={props.tab}/>
+            <td className="buttonsColumn">
+                {
+                    props.tabsStorage.isTabExists(props.tab) ?
+                        (
+                            <>
+                                <TabOpen tab={props.tab}/>
+                                <TabClose tab={props.tab}/>
+                            </>
+                        ): ''
+                }
             </td>
         </tr>
     )
